@@ -1,153 +1,227 @@
 /**
- * MarkChord Syntax Highlighting Styles
- * Version: 2.0.0
+ * MarkChord Plugin Styles - v1.2.0 CLEAN
+ * Fuente monoespaciada uniforme, alineación perfecta, comentarios coherentes.
  */
 
-/* Container for MarkChord blocks */
+/* ============================================
+   BASE
+   ============================================ */
+
 .markchord-block {
-  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  font-family: 'JetBrains Mono','Fira Code','SF Mono','Monaco','Consolas','Courier New',monospace;
   font-size: 14px;
-  line-height: 1.6;
+  line-height: 1.4;  /* Reducido de 1.8 para menos espacio vertical */
   padding: 1em;
-  background-color: var(--code-background);
-  border-radius: 4px;
+  background: var(--code-background);
+  border-left: 1px solid #667eea;
+  border-radius: 8px;
+  margin: 1em 0;
+  overflow-x: auto;
 }
 
 .markchord-line {
-  margin: 0;
-  padding: 0;
+  white-space: pre;
+  min-height: 1.4em;  /* Ajustado al nuevo line-height */
 }
 
-/* Title: # Song Title */
-.markchord-title {
-  font-size: 1.5em;
-  font-weight: bold;
-  color: var(--text-accent);
-  margin-bottom: 0.5em;
-}
+/* ============================================
+   ELEMENTOS GENERALES
+   ============================================ */
 
-/* Section: ## Intro */
-.markchord-section {
-  font-weight: bold;
-  color: var(--text-muted);
-  margin-top: 0.8em;
-}
-
-.markchord-section-name {
-  color: var(--text-muted);
-}
-
-/* Metadata: @key C */
-.markchord-meta {
-  color: var(--text-faint);
-  font-style: italic;
-}
-
-.markchord-meta-at {
-  color: var(--text-accent-hover);
-  font-weight: bold;
-}
-
-.markchord-meta-key {
-  color: var(--text-accent);
-  font-weight: bold;
-}
-
-.markchord-meta-value {
-  color: var(--text-muted);
-}
-
-/* Comments */
-.markchord-comment-line,
-.markchord-comment-beat,
-.markchord-comment-section {
-  color: var(--text-faint);
-  font-style: italic;
-}
-
-.markchord-comment-text {
-  color: var(--text-faint);
-}
-
-/* Discrete symbols (#, ##, /, '', ') */
 .markchord-symbol-discrete {
-  color: var(--text-accent);
+  opacity: 0.2;
+}
+
+/* Título */
+.markchord-title {
+  color: #1E88E5;
   font-weight: bold;
-  opacity: 0.7;
+  font-size: 1.8em;
 }
 
-/* Chord grid lines */
-.markchord-grid {
-  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
-  letter-spacing: 0.05em;
+/* Metadatos */
+.markchord-meta {
+  font-style: normal;
+}
+.markchord-meta-at {
+  color: #9C27B0;
+  opacity: 0.3;
+}
+.markchord-meta-key {
+  color: #9C27B0;
+  font-weight: 500;
+}
+.markchord-meta-value {
+  color: #757575;
 }
 
-/* Bar lines */
-.markchord-bar {
-  color: var(--text-muted);
-  font-weight: bold;
+/* Secciones */
+.markchord-section,
+.markchord-section-name {
+  font-weight: 400;
+  color: #1976D2;
+  margin-top: 0.5em;
 }
 
-/* Repeat markers */
-.markchord-repeat {
-  color: var(--text-accent);
-  font-weight: bold;
+/* Comentarios */
+.markchord-comment-beat,
+.markchord-comment-text,
+.markchord-comment-line,
+.markchord-comment-section {
+  font-family: 'JetBrains Mono','Fira Code',monospace;
+  font-size: 14px;
+  font-weight: 400;
+  font-style: normal;
+  color: #FF8A65;
+  opacity: 0.9;
 }
 
-/* Percent sign */
-.markchord-percent {
-  color: var(--text-faint);
+/* Grilla de acordes */
+.markchord-grid,
+.markchord-grid * {
+  font-family: inherit !important;
+  font-size: 14px !important;
 }
 
-/* ===================================
-   CHORDS - ALL IN GREEN
-   =================================== */
-
-/* All chord types should be green */
+/* Acordes */
 .markchord-chord-major,
 .markchord-chord-minor,
 .markchord-chord-dim,
 .markchord-chord-aug,
 .markchord-chord-sus,
 .markchord-chord-dom {
-  color: #22c55e; /* Green color */
-  font-weight: 600;
+  color: #43A047;
+  font-weight: 400;
 }
 
-/* Dark mode compatibility */
+/* Símbolos */
+.markchord-bar {
+  color: #757575;
+  opacity: 0.6;
+}
+.markchord-repeat {
+  color: #F4511E;
+  font-weight: bold;
+}
+.markchord-percent {
+  color: #9E9E9E;
+}
+
+/* ============================================
+   DARK THEME
+   ============================================ */
+
+.theme-dark .markchord-block {
+  background: rgba(0,0,0,0.3);
+  border-left-color: #64B5F6;
+}
+.theme-dark .markchord-title {
+  color: #64B5F6;
+}
+.theme-dark .markchord-meta-at {
+  color: #BA68C8;
+  opacity: 0.2;
+}
+.theme-dark .markchord-meta-key {
+  color: #BA68C8;
+  font-weight: 500;
+}
+.theme-dark .markchord-meta-value {
+  color: #BDBDBD;
+}
+.theme-dark .markchord-section-name {
+  color: #42A5F5;
+}
+.theme-dark .markchord-comment-beat,
+.theme-dark .markchord-comment-text,
+.theme-dark .markchord-comment-line {
+  color: #FFB74D;
+}
+.theme-dark .markchord-comment-section {
+  color: #BDBDBD;
+}
 .theme-dark .markchord-chord-major,
 .theme-dark .markchord-chord-minor,
 .theme-dark .markchord-chord-dim,
 .theme-dark .markchord-chord-aug,
 .theme-dark .markchord-chord-sus,
 .theme-dark .markchord-chord-dom {
-  color: #4ade80; /* Lighter green for dark mode */
+  color: #81C784;
+}
+.theme-dark .markchord-bar {
+  color: #9E9E9E;
+  opacity: 0.6;
+}
+.theme-dark .markchord-repeat {
+  color: #FF8A65;
 }
 
-/* Optional: slight variations for different chord types while keeping all green */
-/* You can uncomment these if you want subtle differences */
-/*
-.markchord-chord-major {
-  color: #22c55e;
+/* ============================================
+   SCROLLBAR
+   ============================================ */
+
+.markchord-block::-webkit-scrollbar {
+  height: 8px;
+}
+.markchord-block::-webkit-scrollbar-track {
+  background: var(--background-secondary);
+  border-radius: 4px;
+}
+.markchord-block::-webkit-scrollbar-thumb {
+  background: var(--background-modifier-border);
+  border-radius: 4px;
+}
+.markchord-block::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
 }
 
-.markchord-chord-minor {
-  color: #16a34a;
+/* ============================================
+   PRINT
+   ============================================ */
+
+@media print {
+  .markchord-block {
+    page-break-inside: avoid;
+    border-left-color: #000;
+  }
+  .markchord-title {
+    color: #000;
+  }
+  .markchord-chord-major,
+  .markchord-chord-minor,
+  .markchord-chord-dim,
+  .markchord-chord-aug {
+    color: #000;
+    font-weight: bold;
+  }
 }
 
-.markchord-chord-dim {
-  color: #15803d;
+/* ============================================
+   FIX FINAL: Forzar fuente uniforme y sin cursivas
+   ============================================ */
+
+.markchord-block,
+.markchord-block * {
+  font-family: 'JetBrains Mono','Fira Code','SF Mono','Monaco','Consolas','Courier New',monospace !important;
+  font-weight: 400 !important;
+  font-style: normal !important;
+  font-variant-ligatures: none;
 }
 
-.markchord-chord-aug {
-  color: #4ade80;
+.markchord-block em,
+.markchord-block i,
+.markchord-block strong,
+.markchord-block b {
+  font-style: normal !important;
+  font-weight: 400 !important;
 }
 
-.markchord-chord-sus {
-  color: #86efac;
+.markdown-source-view.mod-cm6 .cm-content .markchord-block *,
+.markdown-source-view.mod-cm6 .cm-content .markchord-block em,
+.markdown-source-view.mod-cm6 .cm-content .markchord-block i,
+.markdown-source-view.mod-cm6 .cm-content .markchord-block strong,
+.markdown-source-view.mod-cm6 .cm-content .markchord-block b {
+  font-family: 'JetBrains Mono','Fira Code','SF Mono','Monaco','Consolas','Courier New',monospace !important;
+  font-weight: 400 !important;
+  font-style: normal !important;
 }
-
-.markchord-chord-dom {
-  color: #22c55e;
-}
-*/
