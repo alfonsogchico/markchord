@@ -14,7 +14,6 @@ build/
 # Obsidian plugin build
 packages/obsidian-plugin/main.js
 packages/obsidian-plugin/manifest.json
-packages/obsidian-plugin/styles.css
 
 # IDE
 .vscode/

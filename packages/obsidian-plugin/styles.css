@@ -1,0 +1,153 @@
+/**
+ * MarkChord Syntax Highlighting Styles
+ * Version: 2.0.0
+ */
+
+/* Container for MarkChord blocks */
+.markchord-block {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  padding: 1em;
+  background-color: var(--code-background);
+  border-radius: 4px;
+}
+
+.markchord-line {
+  margin: 0;
+  padding: 0;
+}
+
+/* Title: # Song Title */
+.markchord-title {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: var(--text-accent);
+  margin-bottom: 0.5em;
+}
+
+/* Section: ## Intro */
+.markchord-section {
+  font-weight: bold;
+  color: var(--text-muted);
+  margin-top: 0.8em;
+}
+
+.markchord-section-name {
+  color: var(--text-muted);
+}
+
+/* Metadata: @key C */
+.markchord-meta {
+  color: var(--text-faint);
+  font-style: italic;
+}
+
+.markchord-meta-at {
+  color: var(--text-accent-hover);
+  font-weight: bold;
+}
+
+.markchord-meta-key {
+  color: var(--text-accent);
+  font-weight: bold;
+}
+
+.markchord-meta-value {
+  color: var(--text-muted);
+}
+
+/* Comments */
+.markchord-comment-line,
+.markchord-comment-beat,
+.markchord-comment-section {
+  color: var(--text-faint);
+  font-style: italic;
+}
+
+.markchord-comment-text {
+  color: var(--text-faint);
+}
+
+/* Discrete symbols (#, ##, /, '', ') */
+.markchord-symbol-discrete {
+  color: var(--text-accent);
+  font-weight: bold;
+  opacity: 0.7;
+}
+
+/* Chord grid lines */
+.markchord-grid {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  letter-spacing: 0.05em;
+}
+
+/* Bar lines */
+.markchord-bar {
+  color: var(--text-muted);
+  font-weight: bold;
+}
+
+/* Repeat markers */
+.markchord-repeat {
+  color: var(--text-accent);
+  font-weight: bold;
+}
+
+/* Percent sign */
+.markchord-percent {
+  color: var(--text-faint);
+}
+
+/* ===================================
+   CHORDS - ALL IN GREEN
+   =================================== */
+
+/* All chord types should be green */
+.markchord-chord-major,
+.markchord-chord-minor,
+.markchord-chord-dim,
+.markchord-chord-aug,
+.markchord-chord-sus,
+.markchord-chord-dom {
+  color: #22c55e; /* Green color */
+  font-weight: 600;
+}
+
+/* Dark mode compatibility */
+.theme-dark .markchord-chord-major,
+.theme-dark .markchord-chord-minor,
+.theme-dark .markchord-chord-dim,
+.theme-dark .markchord-chord-aug,
+.theme-dark .markchord-chord-sus,
+.theme-dark .markchord-chord-dom {
+  color: #4ade80; /* Lighter green for dark mode */
+}
+
+/* Optional: slight variations for different chord types while keeping all green */
+/* You can uncomment these if you want subtle differences */
+/*
+.markchord-chord-major {
+  color: #22c55e;
+}
+
+.markchord-chord-minor {
+  color: #16a34a;
+}
+
+.markchord-chord-dim {
+  color: #15803d;
+}
+
+.markchord-chord-aug {
+  color: #4ade80;
+}
+
+.markchord-chord-sus {
+  color: #86efac;
+}
+
+.markchord-chord-dom {
+  color: #22c55e;
+}
+*/
