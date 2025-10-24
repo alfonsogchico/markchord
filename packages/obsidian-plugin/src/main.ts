@@ -1,20 +1,18 @@
 /**
  * MarkChord Syntax Highlighting Plugin for Obsidian
- * Version: 2.0.0 - With Parser Integration
+ * Version: 2.0.0 - With Quick to Standard Converter
  */
 
-import { Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { Plugin, PluginSettingTab, Setting, Notice, Editor, MarkdownView } from 'obsidian';
 
 interface MarkChordSettings {
   theme: string;
   enableInReading: boolean;
-  enableParser: boolean;
 }
 
 const DEFAULT_SETTINGS: MarkChordSettings = {
   theme: 'default',
   enableInReading: true,
-  enableParser: false, // Will enable when parser is integrated
 };
 
 export default class MarkChordPlugin extends Plugin {
@@ -34,6 +32,15 @@ export default class MarkChordPlugin extends Plugin {
 
     // Add settings tab
     this.addSettingTab(new MarkChordSettingTab(this.app, this));
+
+    // Add command to convert Quick to Standard
+    this.addCommand({
+      id: 'convert-quick-to-standard',
+      name: 'Convert Quick to Standard',
+      editorCallback: (editor: Editor, view: MarkdownView) => {
+        this.convertQuickToStandardCommand(editor);
+      }
+    });
 
     console.log('MarkChord plugin loaded successfully');
   }
@@ -56,7 +63,7 @@ export default class MarkChordPlugin extends Plugin {
   highlightMarkChordBlock(source: string, el: HTMLElement) {
     el.empty();
     const lines = source.split('\n');
-    
+
     lines.forEach(line => {
       const lineEl = el.createEl('div', { cls: 'markchord-line' });
       const trimmed = line.trim();
@@ -122,13 +129,13 @@ export default class MarkChordPlugin extends Plugin {
     const pipeIndex = line.indexOf('|');
     const commentPart = line.substring(0, pipeIndex);
     const chordPart = line.substring(pipeIndex);
-    
+
     const spaces = commentPart.match(/^\s*/)?.[0] || '';
     el.appendText(spaces);
     el.createSpan({ cls: 'markchord-symbol-discrete', text: '/' });
     const commentText = commentPart.substring(spaces.length + 1);
     el.createSpan({ cls: 'markchord-comment-text', text: commentText });
-    
+
     this.highlightChordLine(chordPart, el);
   }
 
@@ -139,13 +146,13 @@ export default class MarkChordPlugin extends Plugin {
     const pipeIndex = line.indexOf('|');
     const commentPart = line.substring(0, pipeIndex);
     const chordPart = line.substring(pipeIndex);
-    
+
     const spaces = commentPart.match(/^\s*/)?.[0] || '';
     el.appendText(spaces);
     el.createSpan({ cls: 'markchord-symbol-discrete', text: "''" });
     const commentText = commentPart.substring(spaces.length + 2);
     el.createSpan({ cls: 'markchord-comment-text', text: commentText });
-    
+
     this.highlightChordLine(chordPart, el);
   }
 
@@ -156,7 +163,7 @@ export default class MarkChordPlugin extends Plugin {
     let i = 0;
     while (i < line.length) {
       const char = line[i];
-      
+
       if (char === "'") {
         let commentText = "'";
         i++;
@@ -164,7 +171,7 @@ export default class MarkChordPlugin extends Plugin {
           commentText += line[i];
           i++;
         }
-        
+
         el.createSpan({ cls: 'markchord-symbol-discrete', text: "'" });
         if (commentText.length > 1) {
           el.createSpan({ cls: 'markchord-comment-text', text: commentText.substring(1) });
@@ -200,11 +207,11 @@ export default class MarkChordPlugin extends Plugin {
     const pipeIndex = line.indexOf('|');
     const sectionPart = line.substring(0, pipeIndex);
     const chordPart = line.substring(pipeIndex);
-    
+
     el.createSpan({ cls: 'markchord-symbol-discrete', text: '##' });
     const sectionText = sectionPart.substring(2);
     el.createSpan({ cls: 'markchord-section-name', text: sectionText });
-    
+
     this.highlightChordLine(chordPart, el);
   }
 
@@ -245,37 +252,116 @@ export default class MarkChordPlugin extends Plugin {
         el.createSpan({ cls: 'markchord-bar', text: '|' });
         i++;
       } else if (char === '%') {
-        el.createSpan({ cls: 'markchord-percent', text: '%' });
+        el.createSpan({ cls: 'markchord-repeat-symbol', text: '%' });
         i++;
-      } else if (/[A-G]/.test(char)) {
-        // Parse chord
-        let chord = char;
-        i++;
-        while (i < line.length && /[a-z0-9#b♯♭+°/]/.test(line[i])) {
-          chord += line[i];
+      } else {
+        // Check if we're at the start of a chord (after | or :)
+        const prevChar = i > 0 ? line[i - 1] : '';
+        const isAfterBar = prevChar === '|' || prevChar === ':';
+
+        if (isAfterBar && char !== ' ') {
+          // Extract chord
+          let chord = '';
+          while (i < line.length && line[i] !== '|' && line[i] !== ' ') {
+            chord += line[i];
+            i++;
+          }
+
+          // Determine chord class
+          let chordClass = 'markchord-chord';
+          if (chord.match(/m7|min7|m9|min9|m11|min11|m13|min13/)) {
+            chordClass = 'markchord-chord-min';
+          } else if (chord.match(/maj7|M7|maj9|M9|maj11|M11|maj13|M13/)) {
+            chordClass = 'markchord-chord-maj';
+          } else if (chord.match(/dim|o7/)) {
+            chordClass = 'markchord-chord-dim';
+          } else if (chord.match(/aug|\+/)) {
+            chordClass = 'markchord-chord-aug';
+          } else if (chord.match(/sus/)) {
+            chordClass = 'markchord-chord-sus';
+          } else if (chord.match(/^[A-G][#b]?7/)) {
+            chordClass = 'markchord-chord-dom';
+          }
+
+          el.createSpan({ cls: chordClass, text: chord });
+        } else {
+          el.appendText(char);
           i++;
         }
-        
-        // Determine chord type
-        let chordClass = 'markchord-chord-major';
-        if (chord.match(/m|min|-/)) {
-          chordClass = 'markchord-chord-minor';
-        } else if (chord.match(/dim|°|o/)) {
-          chordClass = 'markchord-chord-dim';
-        } else if (chord.match(/aug|\+/)) {
-          chordClass = 'markchord-chord-aug';
-        } else if (chord.match(/sus/)) {
-          chordClass = 'markchord-chord-sus';
-        } else if (chord.match(/^[A-G][#b]?7/)) {
-          chordClass = 'markchord-chord-dom';
-        }
-        
-        el.createSpan({ cls: chordClass, text: chord });
-      } else {
-        el.appendText(char);
-        i++;
       }
     }
+  }
+
+  /**
+   * Command to convert Quick mode to Standard mode
+   */
+  convertQuickToStandardCommand(editor: Editor) {
+    const cursor = editor.getCursor();
+    const line = cursor.line;
+
+    const codeBlock = this.findMarkChordBlock(editor, line);
+
+    if (!codeBlock) {
+      new Notice('Cursor is not inside a markchord code block');
+      return;
+    }
+
+    const { start, end, content } = codeBlock;
+
+    if (!content.includes('@quick') && !content.includes('@q') && !content.match(/^\s*_[a-z0-9]+/m)) {
+      new Notice('This is not a Quick mode block');
+      return;
+    }
+
+    try {
+      const standardContent = convertQuickToStandard(content);
+      const from = { line: start + 1, ch: 0 };
+      const to = { line: end - 1, ch: editor.getLine(end - 1).length };
+      editor.replaceRange(standardContent, from, to);
+      new Notice('✓ Converted to Standard mode');
+    } catch (error) {
+      console.error('Error converting:', error);
+      new Notice('Error: ' + (error as Error).message);
+    }
+  }
+
+  /**
+   * Find the markchord code block containing the cursor
+   */
+  findMarkChordBlock(editor: Editor, lineNumber: number): { start: number; end: number; content: string } | null {
+    const totalLines = editor.lineCount();
+    let start = -1;
+
+    for (let i = lineNumber; i >= 0; i--) {
+      const line = editor.getLine(i);
+      if (line.trim() === '```markchord') {
+        start = i;
+        break;
+      }
+      if (line.trim().startsWith('```') && line.trim() !== '```markchord') {
+        return null;
+      }
+    }
+
+    if (start === -1) return null;
+
+    let end = -1;
+    for (let i = start + 1; i < totalLines; i++) {
+      const line = editor.getLine(i);
+      if (line.trim() === '```') {
+        end = i;
+        break;
+      }
+    }
+
+    if (end === -1) return null;
+
+    const contentLines = [];
+    for (let i = start + 1; i < end; i++) {
+      contentLines.push(editor.getLine(i));
+    }
+
+    return { start, end, content: contentLines.join('\n') };
   }
 }
 
@@ -318,15 +404,182 @@ class MarkChordSettingTab extends PluginSettingTab {
           this.plugin.settings.enableInReading = value;
           await this.plugin.saveSettings();
         }));
-
-    new Setting(containerEl)
-      .setName('Enable Parser (Experimental)')
-      .setDesc('Use the MarkChord parser for advanced features')
-      .addToggle(toggle => toggle
-        .setValue(this.plugin.settings.enableParser)
-        .onChange(async (value) => {
-          this.plugin.settings.enableParser = value;
-          await this.plugin.saveSettings();
-        }));
   }
+}
+
+// ============================================
+// Quick to Standard Converter
+// ============================================
+
+interface Section {
+  label: string;
+  name: string;
+  lines: string[][];
+  repeat?: number;
+}
+
+const SECTION_NAMES: Record<string, string> = {
+  'i': 'Intro', 'v1': 'Verse 1', 'v2': 'Verse 2', 'v3': 'Verse 3', 'v4': 'Verse 4',
+  'c': 'Chorus', 'pc': 'Pre-Chorus', 'b': 'Bridge', 's': 'Solo', 'm': 'Middle 8',
+  'o': 'Outro', 'k': 'Coda'
+};
+
+function convertQuickToStandard(quickSource: string): string {
+  const lines = quickSource.split('\n');
+  const metadata: Record<string, string> = {};
+  const sections: Section[] = [];
+  let currentSection: Section | null = null;
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+
+    if (trimmed.startsWith('#') && !trimmed.startsWith('##')) {
+      metadata.title = trimmed;
+      continue;
+    }
+
+    if (trimmed.startsWith('@')) {
+      const match = trimmed.match(/^@(\w+)\s*(.*)$/);
+      if (match) {
+        const key = match[1];
+        const value = match[2];
+        if (key === 'quick' || key === 'q') continue;
+        const expandedKey = expandMetadataKey(key);
+        metadata[expandedKey] = value;
+      }
+      continue;
+    }
+
+    if (trimmed.startsWith('_')) {
+      if (currentSection) sections.push(currentSection);
+      const match = trimmed.match(/^_([a-z0-9]+)\s*(.*)$/);
+      if (match) {
+        const label = match[1];
+        const rest = match[2].trim();
+        const sectionName = SECTION_NAMES[label] || capitalize(label);
+        currentSection = { label, name: sectionName, lines: [] };
+        if (rest) {
+          const { chords, repeat } = parseQuickChordLine(rest);
+          if (chords.length > 0) currentSection.lines.push(chords);
+          if (repeat) currentSection.repeat = repeat;
+        }
+      }
+      continue;
+    }
+
+    if (currentSection && trimmed) {
+      const { chords, repeat } = parseQuickChordLine(trimmed);
+      if (chords.length > 0) currentSection.lines.push(chords);
+      if (repeat && !currentSection.repeat) currentSection.repeat = repeat;
+    }
+  }
+
+  if (currentSection) sections.push(currentSection);
+  return generateStandardFormat(metadata, sections);
+}
+
+function expandMetadataKey(key: string): string {
+  const expansions: Record<string, string> = {
+    'k': 'key', 'tm': 'time', 'tr': 'transp', 'bpm': 'tempo', 'l': 'layout', 'n': 'nashville'
+  };
+  return expansions[key] || key;
+}
+
+function parseQuickChordLine(line: string): { chords: string[]; repeat?: number } {
+  let repeat: number | undefined;
+  const repeatMatch = line.match(/\s+x(\d+)\s*$/);
+  if (repeatMatch) {
+    repeat = parseInt(repeatMatch[1]);
+    line = line.substring(0, line.length - repeatMatch[0].length);
+  }
+
+  const tokens = line.trim().split(/\s+/);
+  const chords: string[] = [];
+
+  for (const token of tokens) {
+    if (!token || token.startsWith("'")) continue;
+    if (token.includes('-')) {
+      const parts = token.split('-');
+      chords.push(...parts.map(normalizeChord));
+    } else if (token === '.') {
+      chords.push(' ');
+    } else {
+      chords.push(normalizeChord(token));
+    }
+  }
+
+  return { chords, repeat };
+}
+
+function normalizeChord(chord: string): string {
+  if (!chord || chord === '.') return ' ';
+  let result = chord.charAt(0).toUpperCase() + chord.slice(1);
+  if (/^\d/.test(chord)) result = chord;
+  result = result.replace(/^([A-G][#b]?)d([^a-z]|$)/, '$1maj7$2').replace(/^([A-G][#b]?)M/, '$1maj');
+  return result;
+}
+
+function capitalize(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function generateStandardFormat(metadata: Record<string, string>, sections: Section[]): string {
+  const output: string[] = [];
+  if (metadata.title) output.push(metadata.title);
+
+  const orderedKeys = ['interpretes', 'album', 'year', 'key', 'time', 'tempo', 'transp', 'layout'];
+  if (!metadata.layout) metadata.layout = 'section';
+
+  for (const key of orderedKeys) {
+    if (metadata[key]) output.push('@' + key + ' ' + metadata[key]);
+  }
+  for (const key in metadata) {
+    if (!orderedKeys.includes(key) && key !== 'title') {
+      output.push('@' + key + ' ' + metadata[key]);
+    }
+  }
+  output.push('');
+
+  let maxSectionNameLength = 0;
+  for (const section of sections) {
+    if (section.name.length > maxSectionNameLength) {
+      maxSectionNameLength = section.name.length;
+    }
+  }
+  const leftColumnWidth = maxSectionNameLength + 5;
+
+  for (let i = 0; i < sections.length; i++) {
+    const section = sections[i];
+    const repeatCount = section.repeat || 1;
+
+    for (let r = 0; r < repeatCount; r++) {
+      for (let lineIdx = 0; lineIdx < section.lines.length; lineIdx++) {
+        const chordLine = section.lines[lineIdx];
+        if (r === 0 && lineIdx === 0) {
+          const sectionHeader = ('## ' + section.name).padEnd(leftColumnWidth);
+          const gridLine = formatGridLine(chordLine);
+          output.push(sectionHeader + gridLine);
+        } else {
+          const indent = ' '.repeat(leftColumnWidth);
+          const gridLine = formatGridLine(chordLine);
+          output.push(indent + gridLine);
+        }
+      }
+    }
+
+    if (i < sections.length - 1) output.push('');
+  }
+
+  return output.join('\n');
+}
+
+function formatGridLine(chords: string[]): string {
+  const maxLength = Math.max(...chords.map(c => c.length), 3);
+  const cellWidth = maxLength + 2;
+  const cells = chords.map(chord => {
+    const content = chord.trim() || ' ';
+    return ' ' + content.padEnd(cellWidth - 2) + ' ';
+  });
+  return '|' + cells.join('|') + '|';
 }
