@@ -267,12 +267,12 @@ export default class MarkChordPlugin extends Plugin {
             i++;
           }
 
-          // Determine chord class
+          // Determine chord class - match CSS class names
           let chordClass = 'markchord-chord';
-          if (chord.match(/m7|min7|m9|min9|m11|min11|m13|min13/)) {
-            chordClass = 'markchord-chord-min';
+          if (chord.match(/m7|min7|m9|min9|m11|min11|m13|min13|m/)) {
+            chordClass = 'markchord-chord-minor';
           } else if (chord.match(/maj7|M7|maj9|M9|maj11|M11|maj13|M13/)) {
-            chordClass = 'markchord-chord-maj';
+            chordClass = 'markchord-chord-major';
           } else if (chord.match(/dim|o7/)) {
             chordClass = 'markchord-chord-dim';
           } else if (chord.match(/aug|\+/)) {
