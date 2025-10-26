@@ -255,19 +255,19 @@ export default class MarkChordPlugin extends Plugin {
         el.createSpan({ cls: 'markchord-repeat-symbol', text: '%' });
         i++;
       } else {
-        // Check if we're at the start of a chord (after | or :)
+        // Detectar si estamos en una celda de acorde (después de | o :)
         const prevChar = i > 0 ? line[i - 1] : '';
         const isAfterBar = prevChar === '|' || prevChar === ':';
 
-        if (isAfterBar && char !== ' ') {
-          // Extract chord
+        if (isAfterBar && /[A-G0-9]/.test(char)) {
+          // Encontramos el inicio de un acorde
           let chord = '';
           while (i < line.length && line[i] !== '|' && line[i] !== ' ') {
             chord += line[i];
             i++;
           }
 
-          // Determine chord class - match CSS class names
+          // Determinar clase del acorde
           let chordClass = 'markchord-chord';
           if (chord.match(/m7|min7|m9|min9|m11|min11|m13|min13|m/)) {
             chordClass = 'markchord-chord-minor';
