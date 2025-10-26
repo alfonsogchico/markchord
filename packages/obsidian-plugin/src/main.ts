@@ -504,32 +504,36 @@ function parseQuickChordLine(line: string): { chords: string[]; comments: string
   const tokens = line.trim().split(/\s+/);
   const chords: string[] = [];
   const comments: string[] = [];
+  let pendingComment = ''; // Comentario que va con el siguiente acorde
 
   for (const token of tokens) {
     if (!token) continue;
 
-    // Capturar comentarios
+    // Es un comentario - guardarlo para el siguiente acorde
     if (token.startsWith("'")) {
-      comments.push(token);
-      chords.push(' '); // Espacio en la posición del comentario
+      pendingComment = token;
     }
-    // Acordes con guiones (c-d-em)
+    // Es un acorde con guiones (c-d-em)
     else if (token.includes('-')) {
       const parts = token.split('-');
-      for (const part of parts) {
-        chords.push(normalizeChord(part));
-        comments.push(''); // Sin comentario para estos acordes
+      for (let i = 0; i < parts.length; i++) {
+        chords.push(normalizeChord(parts[i]));
+        // Solo el primer acorde del grupo lleva el comentario pendiente
+        comments.push(i === 0 ? pendingComment : '');
       }
+      pendingComment = '';
     }
-    // Punto para espacio
+    // Es un punto (silencio)
     else if (token === '.') {
       chords.push(' ');
-      comments.push('');
+      comments.push(pendingComment);
+      pendingComment = '';
     }
-    // Acorde normal
+    // Es un acorde normal
     else {
       chords.push(normalizeChord(token));
-      comments.push('');
+      comments.push(pendingComment);
+      pendingComment = '';
     }
   }
 
@@ -587,7 +591,9 @@ function generateStandardFormat(metadata: Record<string, string>, sections: Sect
         if (hasComments) {
           const indent = ' '.repeat(leftColumnWidth);
           const commentGridLine = formatBeatCommentLine(commentLine, chordLine);
-          output.push(indent + commentGridLine);
+          if (commentGridLine) {
+            output.push(indent + commentGridLine);
+          }
         }
 
         // Generar línea de acordes
@@ -620,12 +626,25 @@ function formatGridLine(chords: string[]): string {
 }
 
 function formatBeatCommentLine(comments: string[], chords: string[]): string {
+  // Encontrar el índice del último comentario real
+  let lastCommentIdx = -1;
+  for (let i = comments.length - 1; i >= 0; i--) {
+    if (comments[i] && comments[i].trim()) {
+      lastCommentIdx = i;
+      break;
+    }
+  }
+
+  // Si no hay comentarios, no generar línea
+  if (lastCommentIdx === -1) return '';
+
   // Calcular el ancho de celda basado en los acordes
   const maxLength = Math.max(...chords.map(c => c.length), 3);
   const cellWidth = maxLength + 2;
 
   const cells: string[] = [];
-  for (let i = 0; i < comments.length; i++) {
+  // Solo generar hasta el último comentario real (no después)
+  for (let i = 0; i <= lastCommentIdx; i++) {
     const comment = comments[i];
     if (comment && comment.trim()) {
       // Tiene comentario: usar tal cual (ya tiene ')
