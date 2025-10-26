@@ -91,7 +91,14 @@
 .markchord-chord-dim,
 .markchord-chord-aug,
 .markchord-chord-sus,
-.markchord-chord-dom {
+.markchord-chord-dom,
+.markchord-section .markchord-chord,
+.markchord-section .markchord-chord-major,
+.markchord-section .markchord-chord-minor,
+.markchord-section .markchord-chord-dim,
+.markchord-section .markchord-chord-aug,
+.markchord-section .markchord-chord-sus,
+.markchord-section .markchord-chord-dom {
   color: #43A047 !important;
   font-weight: 400;
 }
@@ -148,7 +155,14 @@
 .theme-dark .markchord-chord-dim,
 .theme-dark .markchord-chord-aug,
 .theme-dark .markchord-chord-sus,
-.theme-dark .markchord-chord-dom {
+.theme-dark .markchord-chord-dom,
+.theme-dark .markchord-section .markchord-chord,
+.theme-dark .markchord-section .markchord-chord-major,
+.theme-dark .markchord-section .markchord-chord-minor,
+.theme-dark .markchord-section .markchord-chord-dim,
+.theme-dark .markchord-section .markchord-chord-aug,
+.theme-dark .markchord-section .markchord-chord-sus,
+.theme-dark .markchord-section .markchord-chord-dom {
   color: #81C784 !important;
 }
 .theme-dark .markchord-bar {
