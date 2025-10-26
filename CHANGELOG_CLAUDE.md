@@ -4,6 +4,84 @@ Este archivo contiene un resumen de todos los cambios realizados por Claude en e
 
 ---
 
+## 2025-10-26 - Fix Chord Detection and CSS Specificity
+
+### Corrección final de highlighting y conversión
+
+**Problema detectado:** Después de restaurar CSS v1.0.4, quedaban dos issues críticos:
+1. Los acordes con espacios después de `|` no se detectaban correctamente (ej: `| Am7 |` vs `|Am7|`)
+2. Los acordes dentro de líneas de sección se veían en azul por herencia de color
+
+**Archivos modificados:**
+- `packages/obsidian-plugin/src/main.ts` - Fix en `highlightChordLine()`
+- `packages/obsidian-plugin/styles.css` - Selectores adicionales para override
+
+### Cambios técnicos
+
+#### Fix 1: Detección de acordes con espacios (main.ts:712)
+
+**Problema:** El código checkeaba `char !== ' '` para detectar inicio de acorde, fallando con formato `| Am7 |`
+
+**Antes:**
+```typescript
+if (isAfterBar && char !== ' ') {
+  // Detectar acorde
+}
+```
+
+**Después:**
+```typescript
+if (isAfterBar && /[A-G0-9]/.test(char)) {
+  // Detectar acorde solo si empieza con nota musical
+}
+```
+
+**Resultado:** Ahora detecta acordes correctamente en ambos formatos:
+- `|Am7|C|Dm7|` ✅
+- `| Am7 | C | Dm7 |` ✅
+
+#### Fix 2: Override de color en secciones (styles.css:95-101)
+
+**Problema:** `.markchord-section` tiene `color: #1976D2` (azul) que se heredaba a los spans de acordes
+
+**Solución:** Agregar selectores específicos con mayor especificidad
+
+**CSS agregado:**
+```css
+.markchord-section .markchord-chord,
+.markchord-section .markchord-chord-major,
+.markchord-section .markchord-chord-minor,
+.markchord-section .markchord-chord-dim,
+.markchord-section .markchord-chord-aug,
+.markchord-section .markchord-chord-sus,
+.markchord-section .markchord-chord-dom {
+  color: #43A047 !important;
+  font-weight: 400;
+}
+```
+
+**Resultado:** Acordes se ven en verde incluso dentro de líneas de sección
+
+### Verificación final
+
+**Estado confirmado por usuario:**
+- ✅ Conversión Quick→Standard preserva comentarios correctamente
+- ✅ Acordes se ven en verde en Reading View: `rgb(67, 160, 71)` = `#43A047`
+- ✅ Comentarios de compás alineados correctamente
+- ✅ No hay compases en blanco insertados
+- ✅ No hay `'` vacíos después del último comentario
+
+**Nota importante:** El syntax highlighting funciona en Reading View (comportamiento normal de plugins de Obsidian). Para highlighting en Edit Mode se requeriría una extensión de CodeMirror 6, que está fuera del scope actual.
+
+### Commits de esta sesión
+
+```bash
+6ce73b0 - Fix chord detection to work with spaces after bar symbols
+db1321f - Add specific CSS rules to override section blue color for chords
+```
+
+---
+
 ## 2025-10-22 (Update 2) - Restore Correct CSS v1.0.4
 
 ### Corrección de estilos
