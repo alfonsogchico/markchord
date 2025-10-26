@@ -415,6 +415,7 @@ interface Section {
   label: string;
   name: string;
   lines: string[][];
+  commentLines: string[][]; // Comentarios de compás por línea
   repeat?: number;
 }
 
@@ -458,10 +459,13 @@ function convertQuickToStandard(quickSource: string): string {
         const label = match[1];
         const rest = match[2].trim();
         const sectionName = SECTION_NAMES[label] || capitalize(label);
-        currentSection = { label, name: sectionName, lines: [] };
+        currentSection = { label, name: sectionName, lines: [], commentLines: [] };
         if (rest) {
-          const { chords, repeat } = parseQuickChordLine(rest);
-          if (chords.length > 0) currentSection.lines.push(chords);
+          const { chords, comments, repeat } = parseQuickChordLine(rest);
+          if (chords.length > 0) {
+            currentSection.lines.push(chords);
+            currentSection.commentLines.push(comments);
+          }
           if (repeat) currentSection.repeat = repeat;
         }
       }
@@ -469,8 +473,11 @@ function convertQuickToStandard(quickSource: string): string {
     }
 
     if (currentSection && trimmed) {
-      const { chords, repeat } = parseQuickChordLine(trimmed);
-      if (chords.length > 0) currentSection.lines.push(chords);
+      const { chords, comments, repeat } = parseQuickChordLine(trimmed);
+      if (chords.length > 0) {
+        currentSection.lines.push(chords);
+        currentSection.commentLines.push(comments);
+      }
       if (repeat && !currentSection.repeat) currentSection.repeat = repeat;
     }
   }
@@ -486,7 +493,7 @@ function expandMetadataKey(key: string): string {
   return expansions[key] || key;
 }
 
-function parseQuickChordLine(line: string): { chords: string[]; repeat?: number } {
+function parseQuickChordLine(line: string): { chords: string[]; comments: string[]; repeat?: number } {
   let repeat: number | undefined;
   const repeatMatch = line.match(/\s+x(\d+)\s*$/);
   if (repeatMatch) {
@@ -496,20 +503,37 @@ function parseQuickChordLine(line: string): { chords: string[]; repeat?: number 
 
   const tokens = line.trim().split(/\s+/);
   const chords: string[] = [];
+  const comments: string[] = [];
 
   for (const token of tokens) {
-    if (!token || token.startsWith("'")) continue;
-    if (token.includes('-')) {
+    if (!token) continue;
+
+    // Capturar comentarios
+    if (token.startsWith("'")) {
+      comments.push(token);
+      chords.push(' '); // Espacio en la posición del comentario
+    }
+    // Acordes con guiones (c-d-em)
+    else if (token.includes('-')) {
       const parts = token.split('-');
-      chords.push(...parts.map(normalizeChord));
-    } else if (token === '.') {
+      for (const part of parts) {
+        chords.push(normalizeChord(part));
+        comments.push(''); // Sin comentario para estos acordes
+      }
+    }
+    // Punto para espacio
+    else if (token === '.') {
       chords.push(' ');
-    } else {
+      comments.push('');
+    }
+    // Acorde normal
+    else {
       chords.push(normalizeChord(token));
+      comments.push('');
     }
   }
 
-  return { chords, repeat };
+  return { chords, comments, repeat };
 }
 
 function normalizeChord(chord: string): string {
@@ -556,6 +580,17 @@ function generateStandardFormat(metadata: Record<string, string>, sections: Sect
     for (let r = 0; r < repeatCount; r++) {
       for (let lineIdx = 0; lineIdx < section.lines.length; lineIdx++) {
         const chordLine = section.lines[lineIdx];
+        const commentLine = section.commentLines[lineIdx] || [];
+
+        // Generar línea de comentarios de compás si existen
+        const hasComments = commentLine.some(c => c && c.trim());
+        if (hasComments) {
+          const indent = ' '.repeat(leftColumnWidth);
+          const commentGridLine = formatBeatCommentLine(commentLine, chordLine);
+          output.push(indent + commentGridLine);
+        }
+
+        // Generar línea de acordes
         if (r === 0 && lineIdx === 0) {
           const sectionHeader = ('## ' + section.name).padEnd(leftColumnWidth);
           const gridLine = formatGridLine(chordLine);
@@ -582,4 +617,24 @@ function formatGridLine(chords: string[]): string {
     return ' ' + content.padEnd(cellWidth - 2) + ' ';
   });
   return '|' + cells.join('|') + '|';
+}
+
+function formatBeatCommentLine(comments: string[], chords: string[]): string {
+  // Calcular el ancho de celda basado en los acordes
+  const maxLength = Math.max(...chords.map(c => c.length), 3);
+  const cellWidth = maxLength + 2;
+
+  const cells: string[] = [];
+  for (let i = 0; i < comments.length; i++) {
+    const comment = comments[i];
+    if (comment && comment.trim()) {
+      // Tiene comentario: usar tal cual (ya tiene ')
+      cells.push(comment.padEnd(cellWidth));
+    } else {
+      // No tiene comentario: poner ' vacío
+      cells.push("'".padEnd(cellWidth));
+    }
+  }
+
+  return cells.join(' ');
 }

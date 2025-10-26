@@ -1,8 +1,5 @@
 /**
  * MarkChord Plugin Styles - v1.0.4 FINAL
- * Este archivo es la referencia para styles.css
- * Copiar a packages/obsidian-plugin/styles.css cuando sea necesario
- *
  * Fuente monoespaciada uniforme, alineación perfecta y ajuste visual fino de comentarios.
  */
 
@@ -66,7 +63,7 @@
   margin-top: 0.5em;
 }
 
-/* Comentarios - NARANJA/SALMON */
+/* Comentarios */
 .markchord-comment-beat,
 .markchord-comment-text,
 .markchord-comment-line,
@@ -88,6 +85,7 @@
 }
 
 /* Acordes - TODOS EN VERDE */
+.markchord-chord,
 .markchord-chord-major,
 .markchord-chord-minor,
 .markchord-chord-dim,
@@ -144,6 +142,7 @@
 .theme-dark .markchord-comment-section {
   color: #BDBDBD;
 }
+.theme-dark .markchord-chord,
 .theme-dark .markchord-chord-major,
 .theme-dark .markchord-chord-minor,
 .theme-dark .markchord-chord-dim,
