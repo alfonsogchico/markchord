@@ -4,6 +4,28 @@ Este archivo contiene un resumen de todos los cambios realizados por Claude en e
 
 ---
 
+## 2025-10-22 (Update 2) - Restore Correct CSS v1.0.4
+
+### Corrección de estilos
+
+**Problema detectado:** El CSS v1.2.0 que restauré anteriormente no era el correcto. El usuario tenía la versión v1.0.4 FINAL que funcionaba correctamente.
+
+**Archivos actualizados:**
+- `packages/obsidian-plugin/styles.css` - Restaurado a v1.0.4 FINAL
+- `packages/obsidian-plugin/src/styles-reference.css` - Actualizado a v1.0.4 FINAL
+
+**Diferencias clave en v1.0.4 FINAL:**
+- `line-height: 1.8` (vs 1.4 en v1.2.0) - Mejor espaciado vertical
+- `margin-bottom: -0.4em` en comentarios - Ajuste visual fino
+- Todas las reglas de alineación vertical con `!important`
+- Ajuste posicional de comentarios con `top: 0.12em`
+
+**Colores confirmados:**
+- Comentarios: #FF8A65 (light) / #FFB74D (dark) - Naranja/salmón
+- Acordes: #43A047 (light) / #81C784 (dark) - Verde para TODOS los tipos
+
+---
+
 ## 2025-10-22 - Quick to Standard Converter + Fix Styles
 
 ### Plugin de Obsidian (packages/obsidian-plugin)

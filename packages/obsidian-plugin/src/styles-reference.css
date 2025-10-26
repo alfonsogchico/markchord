@@ -1,9 +1,9 @@
 /**
- * MarkChord Plugin Styles - v1.2.0 CLEAN
+ * MarkChord Plugin Styles - v1.0.4 FINAL
  * Este archivo es la referencia para styles.css
  * Copiar a packages/obsidian-plugin/styles.css cuando sea necesario
  *
- * Fuente monoespaciada uniforme, alineación perfecta, comentarios coherentes.
+ * Fuente monoespaciada uniforme, alineación perfecta y ajuste visual fino de comentarios.
  */
 
 /* ============================================
@@ -13,7 +13,7 @@
 .markchord-block {
   font-family: 'JetBrains Mono','Fira Code','SF Mono','Monaco','Consolas','Courier New',monospace;
   font-size: 14px;
-  line-height: 1.4;  /* Reducido de 1.8 para menos espacio vertical */
+  line-height: 1.8;
   padding: 1em;
   background: var(--code-background);
   border-left: 1px solid #667eea;
@@ -24,7 +24,7 @@
 
 .markchord-line {
   white-space: pre;
-  min-height: 1.4em;  /* Ajustado al nuevo line-height */
+  min-height: 1.8em;
 }
 
 /* ============================================
@@ -66,7 +66,7 @@
   margin-top: 0.5em;
 }
 
-/* Comentarios */
+/* Comentarios - NARANJA/SALMON */
 .markchord-comment-beat,
 .markchord-comment-text,
 .markchord-comment-line,
@@ -77,6 +77,7 @@
   font-style: normal;
   color: #FF8A65;
   opacity: 0.9;
+  margin-bottom: -0.4em;
 }
 
 /* Grilla de acordes */
@@ -105,9 +106,6 @@
 .markchord-repeat {
   color: #F4511E;
   font-weight: bold;
-}
-.markchord-repeat-symbol {
-  color: #9E9E9E;
 }
 .markchord-percent {
   color: #9E9E9E;
@@ -155,46 +153,124 @@
   color: #81C784;
 }
 .theme-dark .markchord-bar {
-  color: #616161;
+  color: #9E9E9E;
+  opacity: 0.6;
 }
 .theme-dark .markchord-repeat {
-  color: #FF7043;
+  color: #FF8A65;
 }
 
 /* ============================================
-   SCROLLBAR (opcional)
+   SCROLLBAR
    ============================================ */
 
 .markchord-block::-webkit-scrollbar {
   height: 8px;
 }
 .markchord-block::-webkit-scrollbar-track {
-  background: transparent;
+  background: var(--background-secondary);
+  border-radius: 4px;
 }
 .markchord-block::-webkit-scrollbar-thumb {
-  background: #9E9E9E;
+  background: var(--background-modifier-border);
   border-radius: 4px;
 }
 .markchord-block::-webkit-scrollbar-thumb:hover {
-  background: #757575;
+  background: var(--text-muted);
 }
 
 /* ============================================
-   PRINT (opcional)
+   PRINT
    ============================================ */
 
 @media print {
   .markchord-block {
-    border: 1px solid #000;
-    background: white !important;
+    page-break-inside: avoid;
+    border-left-color: #000;
+  }
+  .markchord-title {
+    color: #000;
   }
   .markchord-chord-major,
   .markchord-chord-minor,
   .markchord-chord-dim,
-  .markchord-chord-aug,
-  .markchord-chord-sus,
-  .markchord-chord-dom {
-    color: #000 !important;
+  .markchord-chord-aug {
+    color: #000;
     font-weight: bold;
   }
+}
+
+/* ============================================
+   FIX 1: Fuente uniforme y sin cursivas
+   ============================================ */
+
+.markchord-block,
+.markchord-block * {
+  font-family: 'JetBrains Mono','Fira Code','SF Mono','Monaco','Consolas','Courier New',monospace !important;
+  font-weight: 400 !important;
+  font-style: normal !important;
+  font-variant-ligatures: none;
+}
+
+.markchord-block em,
+.markchord-block i,
+.markchord-block strong,
+.markchord-block b {
+  font-style: normal !important;
+  font-weight: 400 !important;
+}
+
+.markdown-source-view.mod-cm6 .cm-content .markchord-block *,
+.markdown-source-view.mod-cm6 .cm-content .markchord-block em,
+.markdown-source-view.mod-cm6 .cm-content .markchord-block i,
+.markdown-source-view.mod-cm6 .cm-content .markchord-block strong,
+.markdown-source-view.mod-cm6 .cm-content .markchord-block b {
+  font-family: 'JetBrains Mono','Fira Code','SF Mono','Monaco','Consolas','Courier New',monospace !important;
+  font-weight: 400 !important;
+  font-style: normal !important;
+}
+
+/* ============================================
+   FIX 2: Alineación vertical perfecta
+   ============================================ */
+
+.markchord-line {
+  display: inline-block;
+  width: 100%;
+  vertical-align: middle;
+  line-height: 1.8em !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.markchord-comment-beat,
+.markchord-comment-text,
+.markchord-comment-line,
+.markchord-comment-section {
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1.8em !important;
+}
+
+.markchord-section-name,
+.markchord-bar,
+.markchord-repeat {
+  vertical-align: middle;
+  line-height: 1.8em !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* ============================================
+   FIX 3: Ajuste visual fino (bajar comentarios)
+   ============================================ */
+
+.markchord-comment-beat,
+.markchord-comment-text,
+.markchord-comment-line,
+.markchord-comment-section {
+  position: relative;
+  top: 0.12em; /* Ajusta entre 0.1em y 0.2em según preferencia */
 }
