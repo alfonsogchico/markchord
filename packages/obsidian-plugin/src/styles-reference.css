@@ -92,7 +92,7 @@
 .markchord-chord-aug,
 .markchord-chord-sus,
 .markchord-chord-dom {
-  color: #43A047;
+  color: #43A047 !important;
   font-weight: 400;
 }
 
@@ -149,7 +149,7 @@
 .theme-dark .markchord-chord-aug,
 .theme-dark .markchord-chord-sus,
 .theme-dark .markchord-chord-dom {
-  color: #81C784;
+  color: #81C784 !important;
 }
 .theme-dark .markchord-bar {
   color: #9E9E9E;
